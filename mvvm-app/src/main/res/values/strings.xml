@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Linked Lists</string>
+
+    <string name="list_loading">Loading…</string>
+    <string name="list_error">An error occurred.</string>
+    <string name="list_empty">No data.</string>
+
+    <string name="hint_country">Choose your country…</string>
+    <string name="hint_state">Choose your state…</string>
+    <string name="hint_city">Choose your city…</string>
+
+    <string name="error_io">Network error. Please check your connection.</string>
+    <string name="error_unexpected">Unexpected error.</string>
+    <string name="retry">Retry</string>
+
+</resources>
