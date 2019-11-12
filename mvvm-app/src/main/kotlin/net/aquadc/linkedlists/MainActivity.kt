@@ -7,35 +7,36 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.support.annotation.StringRes
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Space
+import androidx.annotation.StringRes
+import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
 import net.aquadc.properties.Property
 import net.aquadc.properties.android.bindings.bindViewTo
 import net.aquadc.properties.android.bindings.view.bindVisibilityHardlyTo
 import net.aquadc.properties.android.bindings.view.setWhenClicked
 import net.aquadc.properties.android.bindings.widget.bindTextTo
-import net.aquadc.properties.android.persistence.parcel.ParcelPropertiesMemento
 import net.aquadc.properties.anyValue
 import net.aquadc.properties.function.isSameAs
 import net.aquadc.properties.map
 import net.aquadc.properties.mapValueList
 import net.aquadc.properties.set
-import org.jetbrains.anko.button
-import org.jetbrains.anko.connectivityManager
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.horizontalMargin
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.space
-import org.jetbrains.anko.spinner
-import org.jetbrains.anko.textResource
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.verticalLayout
-import org.jetbrains.anko.verticalMargin
-import org.jetbrains.anko.verticalPadding
-import org.jetbrains.anko.wrapContent
+import splitties.dimensions.dip
+import splitties.systemservices.connectivityManager
+import splitties.views.dsl.core.button
+import splitties.views.dsl.core.horizontalMargin
+import splitties.views.dsl.core.lParams
+import splitties.views.dsl.core.matchParent
+import splitties.views.dsl.core.spinner
+import splitties.views.dsl.core.textView
+import splitties.views.dsl.core.verticalLayout
+import splitties.views.dsl.core.verticalMargin
+import splitties.views.dsl.core.wrapContent
+import splitties.views.textResource
+import splitties.views.verticalPadding
 import java.io.IOException
 
 
@@ -49,30 +50,30 @@ class MainActivity : Activity() {
         vm = (lastNonConfigurationInstance as LinkedListsViewModel?)
                 ?: LinkedListsViewModel(savedInstanceState?.getParcelable("vm"))
 
-        verticalLayout {
+        setContentView(verticalLayout {
             verticalPadding = dip(16)
 
-            spinner {
+            addView(spinner {
                 layoutParams = spaces()
                 bind(vm.countries, Place::name, R.string.hint_country)
-            }
+            })
 
-            spinner {
+            addView(spinner {
                 layoutParams = spaces()
                 bind(vm.states, Place::name, R.string.hint_state)
-            }
+            })
 
-            spinner {
+            addView(spinner {
                 layoutParams = spaces()
                 bind(vm.cities, Place::name, R.string.hint_city)
-            }
+            })
 
-            space().lparams(matchParent, 0, weight = 1f)
+            addView(Space(this@MainActivity), lParams(matchParent, 0, weight = 1f))
 
             val hasError = listOf(vm.countries.state, vm.states.state, vm.cities.state)
                     .anyValue(isSameAs(ListState.Error))
 
-            textView {
+            addView(textView {
                 layoutParams = spaces()
                 bindTextTo(vm.problem.map { when (it) {
                     null -> ""
@@ -80,24 +81,24 @@ class MainActivity : Activity() {
                     else -> resources.getText(R.string.error_unexpected)
                 } })
                 bindVisibilityHardlyTo(hasError)
-            }
+            })
 
-            button {
+            addView(button {
                 layoutParams = spaces()
                 textResource = R.string.retry
                 bindVisibilityHardlyTo(hasError)
                 setWhenClicked(vm.retryRequested)
-            }
+            })
 
-            space().lparams(matchParent, 0, weight = 1f)
+            addView(Space(this@MainActivity), lParams(matchParent, 0, weight = 1f))
 
-        }
+        })
     }
 
     private val connectivityReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent?) {
-            if (context.connectivityManager.activeNetworkInfo?.isConnected == true)
+            if (connectivityManager.activeNetworkInfo?.isConnected == true)
                 vm.retryRequested.set()
         }
 

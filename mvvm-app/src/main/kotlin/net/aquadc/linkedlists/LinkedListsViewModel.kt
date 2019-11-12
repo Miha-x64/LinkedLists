@@ -1,14 +1,15 @@
 package net.aquadc.linkedlists
 
+import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
 import net.aquadc.properties.MutableProperty
 import net.aquadc.properties.Property
-import net.aquadc.properties.android.persistence.parcel.ParcelPropertiesMemento
 import net.aquadc.properties.clearEachAnd
 import net.aquadc.properties.concurrentPropertyOf
 import net.aquadc.properties.distinct
 import net.aquadc.properties.function.Objectz
 import net.aquadc.properties.persistence.PropertyIo
 import net.aquadc.properties.persistence.memento.PersistableProperties
+import net.aquadc.properties.persistence.memento.restoreTo
 import net.aquadc.properties.persistence.x
 import net.aquadc.properties.propertyOf
 import okhttp3.OkHttpClient
