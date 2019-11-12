@@ -1,6 +1,5 @@
 package net.aquadc.linkedlists
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,7 +12,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Space
 import androidx.annotation.StringRes
-import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
 import net.aquadc.properties.Property
 import net.aquadc.properties.android.bindings.bindViewTo
 import net.aquadc.properties.android.bindings.view.bindVisibilityHardlyTo
@@ -40,15 +38,10 @@ import splitties.views.verticalPadding
 import java.io.IOException
 
 
-class MainActivity : Activity() {
-
-    private lateinit var vm: LinkedListsViewModel
+class MainActivity : InjectableActivity<LinkedListsViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        vm = (lastNonConfigurationInstance as LinkedListsViewModel?)
-                ?: LinkedListsViewModel(savedInstanceState?.getParcelable("vm"))
 
         setContentView(verticalLayout {
             verticalPadding = dip(16)
@@ -113,20 +106,6 @@ class MainActivity : Activity() {
     override fun onStop() {
         unregisterReceiver(connectivityReceiver)
         super.onStop()
-    }
-
-    override fun onRetainNonConfigurationInstance(): Any? =
-            vm // don't reload data lists from scratch
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable("vm", ParcelPropertiesMemento(vm))
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing)
-            vm.destroy()
     }
 
 }

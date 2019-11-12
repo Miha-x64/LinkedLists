@@ -13,13 +13,16 @@ import net.aquadc.properties.persistence.memento.restoreTo
 import net.aquadc.properties.persistence.x
 import net.aquadc.properties.propertyOf
 import okhttp3.OkHttpClient
+import java.io.Closeable
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
 
 
 class LinkedListsViewModel(
+        private val okHttpClient: OkHttpClient,
+        private val io: ExecutorService,
         state: ParcelPropertiesMemento?
-) : PersistableProperties {
+) : PersistableProperties, Closeable {
 
     private val _countries: MutableSingleChoice<Place, Int> = PlaceChoice()
     val countries: SingleChoice<Place, Int> get() = _countries
@@ -45,11 +48,6 @@ class LinkedListsViewModel(
         io x _states.selectedItemId
         io x _cities.selectedItemId
     }
-
-    private val okHttpClient =
-            OkHttpClient.Builder()
-                    .callTimeout(10, TimeUnit.SECONDS)
-                    .build()
 
     init {
         // catch up with saved state NOW, so we won't start unnecessary network calls on state changes
@@ -108,7 +106,7 @@ class LinkedListsViewModel(
         if (choice.state.value === ListState.Error) retryAction()
     }
 
-    fun destroy() {
+    override fun close() {
         loadingCountries?.cancel(true)
         loadingStates?.cancel(true)
         loadingCities?.cancel(true)

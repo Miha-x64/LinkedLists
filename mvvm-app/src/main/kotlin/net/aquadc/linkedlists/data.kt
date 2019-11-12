@@ -9,11 +9,6 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import java.io.IOException
 import java.io.StringReader
-import java.lang.IllegalArgumentException
-import java.net.ProtocolException
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 
 
 class Place( // fixme
@@ -26,17 +21,15 @@ private const val URL_START = "http://lab.iamrohit.in/php_ajax_country_state_cit
 
 @WorkerThread
 fun OkHttpClient.fetchCountries(): List<Place> =
-        fetchPlacesFrom(net.aquadc.linkedlists.URL_START + "Countries")
+        fetchPlacesFrom(URL_START + "Countries")
 
 @WorkerThread
 fun OkHttpClient.fetchStates(countryId: Int): List<Place> =
-        fetchPlacesFrom(net.aquadc.linkedlists.URL_START + "States&countryId=" + countryId)
+        fetchPlacesFrom(URL_START + "States&countryId=" + countryId)
 
 @WorkerThread
 fun OkHttpClient.fetchCities(stateId: Int): List<Place> =
-        fetchPlacesFrom(net.aquadc.linkedlists.URL_START + "Cities&stateId=" + stateId)
-
-val io = ThreadPoolExecutor(0, 8, 30, TimeUnit.SECONDS, LinkedBlockingQueue())
+        fetchPlacesFrom(URL_START + "Cities&stateId=" + stateId)
 
 
 @WorkerThread
