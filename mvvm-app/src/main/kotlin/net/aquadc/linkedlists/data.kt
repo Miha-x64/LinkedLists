@@ -55,7 +55,9 @@ private fun OkHttpClient.fetchPlacesFrom(url: String): List<Struct<Place>> {
             while (it.nextName() != "result") it.skipValue()
 
             it.isLenient = true // let's interpret [] as {} (fuck PHP)
-            it.tokens().entries(emptyArray(), "id", "name").readAs(Place.ListOf)
+            it.tokens()
+                    .entries(emptyArray(), "id", "name") // {$id: $name, ...} -> [ {"id": $id, "name": $name}, ... ]
+                    .readAs(Place.ListOf)
         }
     } catch (e: Exception) {
         println(json)
