@@ -1,6 +1,8 @@
 package net.aquadc.linkedlists
 
 import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
+import net.aquadc.persistence.struct.Struct
+import net.aquadc.persistence.struct.ofStruct
 import net.aquadc.properties.MutableProperty
 import net.aquadc.properties.Property
 import net.aquadc.properties.clearEachAnd
@@ -24,16 +26,16 @@ class LinkedListsViewModel(
         state: ParcelPropertiesMemento?
 ) : PersistableProperties, Closeable {
 
-    private val _countries: MutableSingleChoice<Place, Int> = PlaceChoice()
-    val countries: SingleChoice<Place, Int> get() = _countries
+    private val _countries: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val countries: SingleChoice<Struct<Place>, Int> get() = _countries
     private var loadingCountries: Future<*>? = null
 
-    private val _states: MutableSingleChoice<Place, Int> = PlaceChoice()
-    val states: SingleChoice<Place, Int> get() = _states
+    private val _states: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val states: SingleChoice<Struct<Place>, Int> get() = _states
     private var loadingStates: Future<*>? = null
 
-    private val _cities: MutableSingleChoice<Place, Int> = PlaceChoice()
-    val cities: SingleChoice<Place, Int> get() = _cities
+    private val _cities: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val cities: SingleChoice<Struct<Place>, Int> get() = _cities
     private var loadingCities: Future<*>? = null
 
     private val _problem: MutableProperty<Exception?> = concurrentPropertyOf(null)
@@ -115,7 +117,7 @@ class LinkedListsViewModel(
 }
 
 private fun PlaceChoice() =
-        MutableSingleChoice(Place::id, -1, true)
+        MutableSingleChoice(Place.Id.ofStruct(), -1, true)
 
 private inline fun <T : Any> loadCatching(
         func: () -> List<T>,

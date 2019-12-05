@@ -12,6 +12,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Space
 import androidx.annotation.StringRes
+import net.aquadc.persistence.struct.ofStruct
 import net.aquadc.properties.Property
 import net.aquadc.properties.android.bindings.bindViewTo
 import net.aquadc.properties.android.bindings.view.bindVisibilityHardlyTo
@@ -48,17 +49,17 @@ class MainActivity : InjectableActivity<LinkedListsViewModel>() {
 
             addView(spinner {
                 layoutParams = spaces()
-                bind(vm.countries, Place::name, R.string.hint_country)
+                bind(vm.countries, Place.Name.ofStruct(), R.string.hint_country)
             })
 
             addView(spinner {
                 layoutParams = spaces()
-                bind(vm.states, Place::name, R.string.hint_state)
+                bind(vm.states, Place.Name.ofStruct(), R.string.hint_state)
             })
 
             addView(spinner {
                 layoutParams = spaces()
-                bind(vm.cities, Place::name, R.string.hint_city)
+                bind(vm.cities, Place.Name.ofStruct(), R.string.hint_city)
             })
 
             addView(Space(this@MainActivity), lParams(matchParent, 0, weight = 1f))
