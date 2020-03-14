@@ -8,7 +8,7 @@ import net.aquadc.persistence.struct.Schema
 import net.aquadc.persistence.struct.Struct
 import net.aquadc.persistence.tokens.readAs
 import net.aquadc.persistence.type.collection
-import net.aquadc.persistence.type.long
+import net.aquadc.persistence.type.i32
 import net.aquadc.persistence.type.string
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -18,9 +18,9 @@ import java.io.IOException
 
 
 object Place : Schema<Place>() {
-    val Id = "id" let long
+    val Id = "id" let i32
     val Name = "name" let string
-    val ParentId = "parent_id".let(long, default = -1L) // effectively a foreign key; unused by countries
+    val ParentId = "parent_id".let(i32, default = -1) // effectively a foreign key; unused by countries
 
     val ListOf = collection(Place)
 }
@@ -33,11 +33,11 @@ fun OkHttpClient.fetchCountries(): List<Struct<Place>> =
         fetchPlacesFrom(URL_START + "Countries")
 
 @WorkerThread
-fun OkHttpClient.fetchStates(countryId: Long): List<Struct<Place>> =
+fun OkHttpClient.fetchStates(countryId: Int): List<Struct<Place>> =
         fetchPlacesFrom(URL_START + "States&countryId=" + countryId)
 
 @WorkerThread
-fun OkHttpClient.fetchCities(stateId: Long): List<Struct<Place>> =
+fun OkHttpClient.fetchCities(stateId: Int): List<Struct<Place>> =
         fetchPlacesFrom(URL_START + "Cities&stateId=" + stateId)
 
 
@@ -69,5 +69,3 @@ private fun OkHttpClient.fetchPlacesFrom(url: String): List<Struct<Place>> {
 private fun Response.unwrap(): ResponseBody =
         if (isSuccessful) body()!!
         else throw IOException("HTTP ${code()}")
-
-

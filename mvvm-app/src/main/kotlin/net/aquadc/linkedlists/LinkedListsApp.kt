@@ -15,7 +15,7 @@ class LinkedListsApp : Application() {
 
     // region MainActivity deps
 
-    private lateinit var db: Session
+    private lateinit var db: Session<*>
 
     private val okHttp = lazy {
         OkHttpClient.Builder()

@@ -9,7 +9,6 @@ import net.aquadc.persistence.sql.select
 import net.aquadc.persistence.sql.withTransaction
 import net.aquadc.persistence.struct.Struct
 import net.aquadc.persistence.struct.copy
-import net.aquadc.persistence.struct.ofStruct
 import net.aquadc.properties.MutableProperty
 import net.aquadc.properties.Property
 import net.aquadc.properties.clearEachAnd
@@ -28,30 +27,29 @@ import java.util.concurrent.Future
 
 
 class LinkedListsViewModel(
-        private val database: Session,
+        private val database: Session<*>,
         private val okHttpClient: Lazy<OkHttpClient>,
         private val io: ExecutorService,
         state: ParcelPropertiesMemento?
 ) : PersistableProperties, Closeable {
 
-    private val _countries: MutableSingleChoice<Struct<Place>, Long> = PlaceChoice()
-    val countries: SingleChoice<Struct<Place>, Long> get() = _countries
+    private val _countries: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val countries: SingleChoice<Struct<Place>, Int> get() = _countries
     private var loadingCountries: Future<*>? = null
 
-    private val _states: MutableSingleChoice<Struct<Place>, Long> = PlaceChoice()
-    val states: SingleChoice<Struct<Place>, Long> get() = _states
+    private val _states: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val states: SingleChoice<Struct<Place>, Int> get() = _states
     private var loadingStates: Future<*>? = null
 
-    private val _cities: MutableSingleChoice<Struct<Place>, Long> = PlaceChoice()
-    val cities: SingleChoice<Struct<Place>, Long> get() = _cities
+    private val _cities: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
+    val cities: SingleChoice<Struct<Place>, Int> get() = _cities
     private var loadingCities: Future<*>? = null
 
     private val _problem: MutableProperty<Exception?> = concurrentPropertyOf(null)
     val problem: Property<Exception?> get() = _problem
 
-    val retryRequested: MutableProperty<Boolean> = propertyOf(false).also {
-        it.clearEachAnd(::retry)
-    }
+    val retryRequested: MutableProperty<Boolean> = propertyOf(false)
+            .clearEachAnd(::retry)
 
     override fun saveOrRestore(io: PropertyIo) {
         io x _countries.selectedItemId
@@ -82,7 +80,7 @@ class LinkedListsViewModel(
 
     private fun loadCountries() {
         loadingCountries = io.submit {
-            loadCatching(Countries, -1L, { _ -> fetchCountries() }, _countries, _problem)
+            loadCatching(Countries, -1, { _ -> fetchCountries() }, _countries, _problem)
         }
     }
 
@@ -90,7 +88,7 @@ class LinkedListsViewModel(
         val countryId = _countries.selectedItemId.value
         loadingStates?.cancel(true)
         loadingStates =
-                if (countryId == -1L) null
+                if (countryId == -1) null
                 else io.submit {
                     loadCatching(States, countryId, OkHttpClient::fetchStates, _states, _problem)
                 }
@@ -100,7 +98,7 @@ class LinkedListsViewModel(
         val stateId = _states.selectedItemId.value
         loadingCities?.cancel(true)
         loadingCities =
-                if (stateId == -1L) null
+                if (stateId == -1) null
                 else io.submit {
                     loadCatching(Cities, stateId, OkHttpClient::fetchCities, _cities, _problem)
                 }
@@ -123,8 +121,8 @@ class LinkedListsViewModel(
     }
 
     private inline fun loadCatching(
-            table: SimpleTable<Place, Long>, parentId: Long,
-            download: OkHttpClient.(id: Long) -> List<Struct<Place>>,
+            table: SimpleTable<Place, Int>, parentId: Int,
+            download: OkHttpClient.(id: Int) -> List<Struct<Place>>,
             choice: MutableSingleChoice<Struct<Place>, *>,
             problem: MutableProperty<in Exception>
     ) {
@@ -151,4 +149,4 @@ class LinkedListsViewModel(
 }
 
 private fun PlaceChoice() =
-        MutableSingleChoice(Place.Id.ofStruct(), -1, true)
+        MutableSingleChoice(Place.Id, -1, true)
