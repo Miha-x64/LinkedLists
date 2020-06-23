@@ -2,7 +2,7 @@ package net.aquadc.linkedlists
 
 import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
 import net.aquadc.persistence.sql.Session
-import net.aquadc.persistence.sql.SimpleTable
+import net.aquadc.persistence.sql.Table
 import net.aquadc.persistence.sql.asc
 import net.aquadc.persistence.sql.eq
 import net.aquadc.persistence.sql.select
@@ -121,10 +121,10 @@ class LinkedListsViewModel(
     }
 
     private inline fun loadCatching(
-            table: SimpleTable<Place, Int>, parentId: Int,
-            download: OkHttpClient.(id: Int) -> List<Struct<Place>>,
-            choice: MutableSingleChoice<Struct<Place>, *>,
-            problem: MutableProperty<in Exception>
+        table: Table<Place, Int>, parentId: Int,
+        download: OkHttpClient.(id: Int) -> List<Struct<Place>>,
+        choice: MutableSingleChoice<Struct<Place>, *>,
+        problem: MutableProperty<in Exception>
     ) {
         try {
             choice.state.value = ListState.Loading

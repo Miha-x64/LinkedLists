@@ -67,5 +67,5 @@ private fun OkHttpClient.fetchPlacesFrom(url: String): List<Struct<Place>> {
 
 
 private fun Response.unwrap(): ResponseBody =
-        if (isSuccessful) body()!!
-        else throw IOException("HTTP ${code()}")
+        if (isSuccessful) body!!
+        else throw IOException("HTTP $code")

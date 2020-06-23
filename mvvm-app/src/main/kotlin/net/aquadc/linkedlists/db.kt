@@ -3,7 +3,7 @@ package net.aquadc.linkedlists
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import net.aquadc.persistence.sql.SimpleTable
+import net.aquadc.persistence.sql.Table
 import net.aquadc.persistence.sql.blocking.SqliteSession
 import net.aquadc.persistence.sql.dialect.sqlite.SqliteDialect
 
@@ -12,9 +12,9 @@ import net.aquadc.persistence.sql.dialect.sqlite.SqliteDialect
 // Lychee SQL API is a subject to change //
 ///////////////////////////////////////////
 
-val Countries: SimpleTable<Place, Int> = SimpleTable(Place, "countries", Place.Id)
-val States: SimpleTable<Place, Int> = SimpleTable(Place, "states", Place.Id)
-val Cities: SimpleTable<Place, Int> = SimpleTable(Place, "cities", Place.Id)
+val Countries: Table<Place, Int> = Table(Place, "countries", Place.Id)
+val States: Table<Place, Int> = Table(Place, "states", Place.Id)
+val Cities: Table<Place, Int> = Table(Place, "cities", Place.Id)
 
 fun Context.PlacesDatabase() = SqliteSession(object : SQLiteOpenHelper(this, "places", null, 1) {
     override fun onCreate(db: SQLiteDatabase) {
