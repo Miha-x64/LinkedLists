@@ -1,0 +1,12 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+version 'unspecified'
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    api "net.aquadc.properties:persistence:$lychee_version"
+    api "net.aquadc.properties:sql-experimental:$lychee_version" // SQL API will be changed!
+    api "net.aquadc.properties:http:$lychee_version"
+}

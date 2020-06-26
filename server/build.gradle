@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'application'
+}
+
+version 'unspecified'
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.xerial:sqlite-jdbc:3.32.3'
+    implementation 'com.squareup.moshi:moshi:1.9.3'
+    implementation 'io.undertow:undertow-core:2.1.0.Final'
+    implementation(project(':common'))
+}
+
+application {
+    mainClassName = 'net.aquadc.linkedlists.server.Server'
+    applicationDefaultJvmArgs = [
+            '-Xss256K', '-Xms16M', '-Xmx32M', '-XX:MetaspaceSize=16M', '-XX:MaxMetaspaceSize=32M',
+            '-XX:+UnlockExperimentalVMOptions', '-XX:+TrustFinalNonStaticFields'
+    ]
+}

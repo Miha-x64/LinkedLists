@@ -20,17 +20,16 @@ import net.aquadc.properties.persistence.memento.PersistableProperties
 import net.aquadc.properties.persistence.memento.restoreTo
 import net.aquadc.properties.persistence.x
 import net.aquadc.properties.propertyOf
-import okhttp3.OkHttpClient
 import java.io.Closeable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
 
 class LinkedListsViewModel(
-        private val database: Session<*>,
-        private val okHttpClient: Lazy<OkHttpClient>,
-        private val io: ExecutorService,
-        state: ParcelPropertiesMemento?
+    private val database: Session<*>,
+    private val httpApi: Lazy<HttpApi>,
+    private val io: ExecutorService,
+    state: ParcelPropertiesMemento?
 ) : PersistableProperties, Closeable {
 
     private val _countries: MutableSingleChoice<Struct<Place>, Int> = PlaceChoice()
@@ -58,7 +57,8 @@ class LinkedListsViewModel(
     }
 
     init {
-        // catch up with saved state NOW, so we won't start unnecessary network calls on state changes
+        // catch up with saved state NOW,
+        // thus we won't trigger state changes and start unnecessary network calls or DB queries
         if (state !== null) state.restoreTo(this)
 
         loadCountries()
@@ -80,7 +80,7 @@ class LinkedListsViewModel(
 
     private fun loadCountries() {
         loadingCountries = io.submit {
-            loadCatching(Countries, -1, { _ -> fetchCountries() }, _countries, _problem)
+            loadCatching(Countries, -1, { httpApi.value.countries() }, _countries, _problem)
         }
     }
 
@@ -90,7 +90,7 @@ class LinkedListsViewModel(
         loadingStates =
                 if (countryId == -1) null
                 else io.submit {
-                    loadCatching(States, countryId, OkHttpClient::fetchStates, _states, _problem)
+                    loadCatching(States, countryId, { httpApi.value.states(it) }, _states, _problem)
                 }
     }
 
@@ -100,7 +100,7 @@ class LinkedListsViewModel(
         loadingCities =
                 if (stateId == -1) null
                 else io.submit {
-                    loadCatching(Cities, stateId, OkHttpClient::fetchCities, _cities, _problem)
+                    loadCatching(Cities, stateId, { httpApi.value.cities(it) }, _cities, _problem)
                 }
     }
 
@@ -122,7 +122,7 @@ class LinkedListsViewModel(
 
     private inline fun loadCatching(
         table: Table<Place, Int>, parentId: Int,
-        download: OkHttpClient.(id: Int) -> List<Struct<Place>>,
+        download: (id: Int) -> List<Struct<Place>>,
         choice: MutableSingleChoice<Struct<Place>, *>,
         problem: MutableProperty<in Exception>
     ) {
@@ -131,7 +131,7 @@ class LinkedListsViewModel(
 
             var items: List<Struct<Place>> = database[table].select(Place.ParentId eq parentId, Place.Name.asc).value
             if (items.isEmpty()) {
-                items = okHttpClient.value.download(parentId)
+                items = download(parentId)
                 database.withTransaction {
                     items.forEach { insert(table, it.copy { it[ParentId] = parentId }) }
                 }
@@ -146,7 +146,7 @@ class LinkedListsViewModel(
         }
     }
 
-}
-
-private fun PlaceChoice() =
+    private fun PlaceChoice() =
         MutableSingleChoice(Place.Id, -1, true)
+
+}

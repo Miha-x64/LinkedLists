@@ -17,10 +17,14 @@ class LinkedListsApp : Application() {
 
     private lateinit var db: Session<*>
 
-    private val okHttp = lazy {
-        OkHttpClient.Builder()
+    private val httpApi = lazy {
+        HttpApi(
+            OkHttpClient.Builder()
                 .callTimeout(10, TimeUnit.SECONDS)
-                .build()
+                .build(),
+            BuildConfig.SERVER,
+            HttpContract(BuildConfig.PATH)
+        )
     }
 
     private val io =
@@ -35,8 +39,10 @@ class LinkedListsApp : Application() {
             override fun <VM> injectInto(activity: InjectableActivity<VM>, savedInstanceState: Bundle?)
                     where VM : PersistableProperties, VM : Closeable {
                 when (activity) {
-                    is MainActivity -> activity.vm = LinkedListsViewModel(db, okHttp, io, savedInstanceState?.getParcelable("vm"))
-                    else -> throw AssertionError()
+                    is MainActivity ->
+                        activity.vm = LinkedListsViewModel(db, httpApi, io, savedInstanceState?.getParcelable("vm"))
+                    else ->
+                        throw AssertionError()
                 }
             }
         })

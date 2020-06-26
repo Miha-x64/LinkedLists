@@ -33,6 +33,19 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    flavorDimensions 'server'
+    productFlavors {
+        hosted {
+            dimension 'server'
+            buildConfigField('String', 'SERVER', '"http://lab.iamrohit.in/php_ajax_country_state_city_dropdown/"')
+            buildConfigField('String', 'PATH', '"apiv1.php"')
+        }
+        local {
+            dimension 'server'
+            buildConfigField('String', 'SERVER', '"http://192.168.0.103:8080"')
+            buildConfigField('String', 'PATH', 'net.aquadc.linkedlists.CommonKt.LOCAL_PATH')
+        }
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -53,10 +66,10 @@ dependencies {
     implementation "com.louiscad.splitties:splitties-views-dsl:$splitties_version"
     implementation "com.louiscad.splitties:splitties-systemservices:$splitties_version"
     implementation "net.aquadc.properties:android-bindings:$lychee_version"
+    implementation "net.aquadc.properties:android-json:$lychee_version"
     implementation "net.aquadc.properties:properties:$lychee_version"
-    implementation "net.aquadc.properties:persistence:$lychee_version"
     implementation "net.aquadc.properties:extended-persistence:$lychee_version" // TokenStream.entries transform
-    implementation "net.aquadc.properties:sql-experimental:$lychee_version" // SQL API will be changed!
+    implementation(project(':common'))
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
