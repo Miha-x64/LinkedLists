@@ -19,3 +19,5 @@ Server:
 * [Undertow](http://undertow.io/) HTTP server
 * [Moshi](https://github.com/square/moshi/) to build JSON
 * [SQLite-JDBC](https://github.com/xerial/sqlite-jdbc) to store data
+
+![Screencast](screencast.gif)
