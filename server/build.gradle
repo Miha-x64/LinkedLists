@@ -7,16 +7,16 @@ plugins {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    implementation 'org.xerial:sqlite-jdbc:3.32.3'
-    implementation 'io.undertow:undertow-core:2.1.0.Final'
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+    implementation 'io.undertow:undertow-core:2.2.17.Final'
 
-    implementation("net.aquadc.properties:android-json:$lychee_version") {
+    implementation("su.lychee:android-json:$lychee_version") {
         because 'reuse Android JSON bindings on server-side'
     }
-    implementation("net.aquadc.properties:android-json-on-jvm:$lychee_version") {
+    implementation("su.lychee:android-json-on-jvm:$lychee_version") {
         because 'using com.google.gson.stream.JsonReader/Writer to mimic android.util.JsonReader/Writer'
     }
-    implementation("net.aquadc.properties:extended-persistence:$lychee_version") {
+    implementation("su.lychee:extended-persistence:$lychee_version") {
         because 'TokenStream.associate transform'
     }
 

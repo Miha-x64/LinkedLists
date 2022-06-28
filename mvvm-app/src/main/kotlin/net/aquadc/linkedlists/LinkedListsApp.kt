@@ -1,8 +1,10 @@
 package net.aquadc.linkedlists
 
 import android.app.Application
+import android.database.Cursor
 import android.os.Bundle
 import net.aquadc.persistence.sql.Session
+import net.aquadc.persistence.sql.blocking.Blocking
 import net.aquadc.properties.persistence.memento.PersistableProperties
 import okhttp3.OkHttpClient
 import java.io.Closeable
@@ -15,7 +17,7 @@ class LinkedListsApp : Application() {
 
     // region MainActivity deps
 
-    private lateinit var db: Session<*>
+    private lateinit var db: Session<Blocking<Cursor>>
 
     private val httpApi = lazy {
         HttpApi(

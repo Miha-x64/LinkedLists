@@ -6,7 +6,9 @@ version 'unspecified'
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    api "net.aquadc.properties:persistence:$lychee_version"
-    api "net.aquadc.properties:sql-experimental:$lychee_version" // SQL API will be changed!
-    api "net.aquadc.properties:http:$lychee_version"
+    api "su.lychee:persistence:$lychee_version"
+    api "su.lychee:sql:$lychee_version" // SQL API will be changed!
+    implementation "su.lychee:properties:$lychee_version" // used by SQL
+    api "su.lychee:http:$lychee_version"
+    implementation "com.github.Miha-x64.Kotlin-MPP_Collection_utils:Collection-utils-jvm:1.0-alpha05"
 }

@@ -22,7 +22,7 @@ import net.aquadc.persistence.sql.blocking.Eagerly.cell
 import net.aquadc.persistence.sql.blocking.Eagerly.structs
 import net.aquadc.persistence.sql.blocking.JdbcSession
 import net.aquadc.persistence.sql.dialect.sqlite.SqliteDialect
-import net.aquadc.persistence.sql.query
+import net.aquadc.persistence.sql.template.Query
 import net.aquadc.persistence.struct.Struct
 import net.aquadc.persistence.tokens.tokensFrom
 import net.aquadc.persistence.type.collection
@@ -80,22 +80,22 @@ fun main(args: Array<String>) {
     val session = JdbcSession(DriverManager.getConnection("jdbc:sqlite:geo.db"), SqliteDialect)
     // Note: this country-city-state database is poor, don't use it    ^^^^^^
 
-    val countries = session.query("SELECT id, name, -1 as \"parent_id\" FROM \"countries\"", structs<ResultSet, Place>(Countries, BindBy.Name))
+    val countries = Query("SELECT id, name, -1 as \"parent_id\" FROM \"countries\"", structs<ResultSet, Place>(Countries, BindBy.Name))
 
-    val assertCountry = session.query("SELECT 1 FROM \"countries\" WHERE \"id\" = ?", i32, cell<ResultSet, Int>(i32))
-    val states = session.query("SELECT * FROM \"states\" WHERE \"parent_id\" = ?", i32, structs<ResultSet, Place>(States, BindBy.Name))
+    val assertCountry = Query("SELECT 1 FROM \"countries\" WHERE \"id\" = ?", i32, cell<ResultSet, Int>(i32))
+    val states = Query("SELECT * FROM \"states\" WHERE \"parent_id\" = ?", i32, structs<ResultSet, Place>(States, BindBy.Name))
 
-    val assertState = session.query("SELECT 1 FROM \"states\" WHERE \"id\" = ?", i32, cell<ResultSet, Int>(i32))
-    val cities = session.query("SELECT * FROM \"cities\" WHERE \"parent_id\" = ?", i32, structs<ResultSet, Place>(Cities, BindBy.Name))
+    val assertState = Query("SELECT 1 FROM \"states\" WHERE \"id\" = ?", i32, cell<ResultSet, Int>(i32))
+    val cities = Query("SELECT * FROM \"cities\" WHERE \"parent_id\" = ?", i32, structs<ResultSet, Place>(Cities, BindBy.Name))
 
     Undertow.builder()
         .addHttpListener(
             8080, host,
             RoutingHandler(false)
                 .add("GET", "/") { it.respondText("(ό‿ὸ)ﾉ") }
-                .add(contract.countries, respond, handler = countries)
-                .add(contract.states, respond, respondBad) { countryId -> assertCountry(countryId); states(countryId) }
-                .add(contract.cities, respond, respondBad) { stateId -> assertState(stateId); cities(stateId) }
+                .add(contract.countries, respond, handler = { session.countries() })
+                .add(contract.states, respond, respondBad) { countryId -> session.assertCountry(countryId); session.states(countryId) }
+                .add(contract.cities, respond, respondBad) { stateId -> session.assertState(stateId); session.cities(stateId) }
                 .setFallbackHandler { it.statusCode = 404; it.respondText("(ノಠ益ಠ)ノ彡┻━┻") }
         )
         .build().start()

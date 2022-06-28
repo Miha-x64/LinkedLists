@@ -1,11 +1,12 @@
 package net.aquadc.linkedlists
 
+import android.database.Cursor
 import net.aquadc.persistence.android.parcel.ParcelPropertiesMemento
+import net.aquadc.persistence.sql.BindBy
 import net.aquadc.persistence.sql.Session
 import net.aquadc.persistence.sql.Table
-import net.aquadc.persistence.sql.asc
-import net.aquadc.persistence.sql.eq
-import net.aquadc.persistence.sql.select
+import net.aquadc.persistence.sql.blocking.Blocking
+import net.aquadc.persistence.sql.blocking.Eagerly
 import net.aquadc.persistence.sql.withTransaction
 import net.aquadc.persistence.struct.Struct
 import net.aquadc.persistence.struct.copy
@@ -26,7 +27,7 @@ import java.util.concurrent.Future
 
 
 class LinkedListsViewModel(
-    private val database: Session<*>,
+    private val database: Session<Blocking<Cursor>>,
     private val httpApi: Lazy<HttpApi>,
     private val io: ExecutorService,
     state: ParcelPropertiesMemento?
@@ -129,7 +130,12 @@ class LinkedListsViewModel(
         try {
             choice.state.value = ListState.Loading
 
-            var items: List<Struct<Place>> = database[table].select(Place.ParentId eq parentId, Place.Name.asc).value
+            var items: List<Struct<Place>> = database.rawQuery(
+                "SELECT * FROM ${table.name} WHERE ${Place.ParentId.name(Place)} = ? ORDER BY ${Place.Name.name(Place)} ASC",
+                arrayOf(Place.ParentId.type(Place)),
+                arrayOf(parentId),
+                Eagerly.structs(table, BindBy.Name)
+            )
             if (items.isEmpty()) {
                 items = download(parentId)
                 database.withTransaction {
